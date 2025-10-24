@@ -1,23 +1,18 @@
-// Define PINS
-#define photo_Pin A2
-#define alert_Pin 8   // LED pin
+#define PHOTO_PIN A2
+#define ALERT_PIN 8
 
-// Threshold (converted to % since we are using mapping)
-const int light_Threshold_Percent = 21;  // 220 raw ≈ 21%
+const int LIGHT_THRESHOLD_PERCENT = 21;
 
-bool shouldBlink = false;   // stays true even after brightness drops
-bool stopBlink = false;     // becomes true when user types "stop"
+bool shouldBlink = false;
+bool stopBlink = false;
 
 void setup() {
-  pinMode(alert_Pin, OUTPUT);
+  pinMode(ALERT_PIN, OUTPUT);
   Serial.begin(9600);
 }
 
 void loop() {
-  // read sensor raw value
-  int brightnessRaw = analogRead(photo_Pin);
-
-  // MAPPING: convert 0–1023 to 0–100% 
+  int brightnessRaw = analogRead(PHOTO_PIN);
   int brightnessPercent = map(brightnessRaw, 0, 1023, 0, 100);
 
   Serial.print("Brightness: ");
@@ -26,29 +21,27 @@ void loop() {
   Serial.print(brightnessPercent);
   Serial.println("%)");
 
-  // If brightness is above threshold (now in percent), start blinking mode
-  if (brightnessPercent >= light_Threshold_Percent) {
+  if (brightnessPercent >= LIGHT_THRESHOLD_PERCENT) {
     shouldBlink = true; 
   }
 
-  // Check Serial input for STOP command
   if (Serial.available()) {
     String input = Serial.readStringUntil('\n');
-    input.toLowerCase();  // make it case insensitive
+    input.toLowerCase();
     if (input == "stop") {
       shouldBlink = false;
-      digitalWrite(alert_Pin, LOW); // turn LED off immediately
+      digitalWrite(ALERT_PIN, LOW);
     }
   }
 
-  // Blinking behavior
   if (shouldBlink) {
-    digitalWrite(alert_Pin, HIGH);
+    digitalWrite(ALERT_PIN, HIGH);
     delay(100);
-    digitalWrite(alert_Pin, LOW);
+    digitalWrite(ALERT_PIN, LOW);
     delay(100);
   } else {
-    digitalWrite(alert_Pin, LOW);
+    digitalWrite(ALERT_PIN, LOW);
     delay(200);
   }
 }
+
